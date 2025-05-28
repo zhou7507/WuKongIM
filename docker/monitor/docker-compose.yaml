@@ -17,23 +17,23 @@ services:
     restart: unless-stopped
     environment:
       - TZ=Asia/Shanghai
-    # volumes:
+      # volumes:
       # - '/:/host:ro,rslave'
     ports:
-      - "9100:9100"    
+      - "9100:9100"
   prometheus:
     image: prom/prometheus:latest
     volumes:
-      - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+      - "./prometheus_1.yml:/etc/prometheus/prometheus.yml"
     ports:
       - "9090:9090"
   loki:
     image: grafana/loki:2.9.2
     volumes:
-      - "./loki-config.yaml:/etc/loki/loki-config.yaml"  
+      - "./loki-config.yaml:/etc/loki/loki-config.yaml"
     ports:
       - "3100:3100"
-    command: -config.file=/etc/loki/loki-config.yaml  
+    command: -config.file=/etc/loki/loki-config.yaml
   grafana:
     environment:
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
@@ -60,4 +60,4 @@ services:
         /run.sh
     image: grafana/grafana:latest
     ports:
-      - "3000:3000"      
+      - "3000:3000"
