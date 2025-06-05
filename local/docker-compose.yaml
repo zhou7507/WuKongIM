@@ -1,0 +1,42 @@
+version: '3.7'
+services:
+  wukongim: # WuKongIM服务
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/wukongim:v2
+    environment:
+      - "WK_CLUSTER_NODEID=1001"
+      - "WK_CLUSTER_SERVERADDR=host.docker.internal:11110" # 节点内部通信请求地址
+      - "WK_TRACE_PROMETHEUSAPIURL=http://prometheus:9090" # prometheus监控地址
+      - "WK_MODE=release" # release模式
+      - "WK_EXTERNAL_IP=host.docker.internal" # 服务器外网ip
+      - "WK_CLUSTER_APIURL=http://host.docker.internal:5001" # api的内网地址
+      - "WK_INTRANET_TCPADDR=host.docker.internal:5100" # tcp连接的内网地址，此配置主要用于压测
+      # 个人配置
+      - "WK_WEBHOOK_HTTPADDR=http://host.docker.internal:8000/api/client/wk/webhook" #  webhook的http地址 通过此地址通知数据给第三方 地址为你提供的api接口地址
+      - "WK_AUTH_ON=true" #  是否开启认证
+      - "WK_AUTH_KIND=jwt" # 认证方式 jwt: jwt认证 none: 无需认证
+      - "WK_AUTH_USERS=justin:justin123:*" # 用户配置
+      - "WK_JWT_SECRET=0B7A4849F9C74CA9B9DE8A7C50A52369" # 认证方式 jwt: jwt认证 none: 无需认证
+      - "WK_JWT_EXPIRE=30d" # jwt 过期时间
+      - "WK_TOKENAUTHON=true" # token验证
+      - "WK_MANAGERTOKEN=00452992F21E4F8E99DFF22FAA2DC5F7"
+    healthcheck:
+      test: "wget -q -Y off -O /dev/null http://localhost:5001/health > /dev/null 2>&1"
+      interval: 10s
+      timeout: 10s
+      retries: 3
+    restart: always
+    volumes:
+      - ./wukongimdata:/root/wukongim # 数据挂载到物理机的目录
+    ports:
+      - 5001:5001 # http api 端口
+      - 5100:5100 # tcp端口
+      - 5200:5200 # websocket端口
+      - 5300:5300 # 管理端端口
+      - 5172:5172 # demo端口
+      - 11110:11110 # 分布式节点通讯端口
+  prometheus:  # 监控服务
+    image: registry.cn-shanghai.aliyuncs.com/wukongim/prometheus:v2.53.1
+    volumes:
+      - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+    ports:
+      - "9090:9090"
