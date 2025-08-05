@@ -26,7 +26,7 @@ services:
       retries: 3
     restart: always
     volumes:
-      - ./wukongimdata:/root/wukongim # 数据挂载到物理机的目录
+      - /Users/zhou/Documents/project/go/fork/WuKongIM/wukongimdata:/root/wukongim # 数据挂载到物理机的目录
     ports:
       - 5001:5001 # http api 端口
       - 5100:5100 # tcp端口
